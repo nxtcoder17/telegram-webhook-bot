@@ -1,0 +1,21 @@
+version: 3
+
+dotenv:
+  - .secrets/env
+
+tasks:
+  run: 
+    interactive: true
+    cmds:
+      - fwatcher --exec 'go run . --addr :3000' --ext '.go'
+
+  build:
+    env:
+      CGO_ENABLED: 0
+    cmds:
+      - go build -o ./bin/tg-webhook-bot .
+
+  container:build:
+    cmds:
+      - task: build
+      - nerdctl build -f ./Dockerfile --build-arg BINARY="bin/tg-webhook-bot" -t ghcr.io/kloudlite/infrastructure-as-code/iac-job:it-is-tgbot .
